@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ConsoleApp.Core;
 using ConsoleApp.Services;
 using Microsoft.Extensions.Logging;
+using NetCoreSample.Core.Core.Interface;
 using NetCoreSample.Core.Domain;
 
 namespace ConsoleApp
@@ -14,17 +15,23 @@ namespace ConsoleApp
         // private readonly AppSettings _config;
         private readonly IRaceService _raceService;
         private readonly IUserScoreService _userScoreService;
+        private readonly IUserScoreDBSearch _userScoreDBSearch;
+        private readonly IRaceDBSearch _raceDBSearch;
 
-        public App(ITestService testService, ILogger<App> logger, IRaceService raceService, IUserScoreService userScoreService)
+        public App(ITestService testService, ILogger<App> logger, IRaceService raceService, IUserScoreService userScoreService, IUserScoreDBSearch userScoreDBSearch, IRaceDBSearch raceDBSearch)
         {
             _testService = testService;
             _logger = logger;
             _raceService = raceService;
             _userScoreService = userScoreService;
+            _userScoreDBSearch = userScoreDBSearch;
+            _raceDBSearch = raceDBSearch;
+            Console.WriteLine("App constructor");
         }
 
         public async Task Run()
         {
+            // return;
             //_logger.LogInformation($"This is a console application for {_config.Title}");
             _testService.Run();
 
@@ -46,6 +53,9 @@ namespace ConsoleApp
                     Date = DateTime.Now,
                     Location = "Suzhou"
                 };
+
+                Console.WriteLine(newItem.Date);
+
                 Console.WriteLine(newItem.Id);
                 await _raceService.Insert(newItem);
 
@@ -62,12 +72,26 @@ namespace ConsoleApp
                 {
                     Console.WriteLine($"{item.Id}, {item.UserName}, {item.Score}");
                 }
+
+                Console.WriteLine("Search by Dapper....");
+
+                var raceItems = await _raceDBSearch.SearchRaceList("a");
+                foreach (var item in raceItems)
+                {
+                    Console.WriteLine($"{item.Id}, {item.Name}, {item.Date:yyyy-MM-dd HH:mm}");
+                }
+
+                var userScoreItems = await _userScoreDBSearch.SearchList("L");
+                foreach (var item in userScoreItems)
+                {
+                    Console.WriteLine($"{item.Id}, {item.UserName}, {item.Score}");
+                }
             }
             catch (Exception e)
             {
                 _logger.LogError(e.Message, e);
             }
-            
+
             System.Console.ReadKey();
         }
     }

@@ -11,12 +11,15 @@ using System.Net;
 using System.Net.Mail;
 using System.Reflection;
 using System.Threading.Tasks;
+using ConsoleApp.Config;
 using FXTech.PDCA.Core.Interfaces.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NetCoreSample.Core.Core.Interface;
 using NetCoreSample.Core.Domain;
 using NetCoreSample.Core.Domain.User;
 using NetCoreSample.Data;
+using NetCoreSample.Data.Search;
 
 namespace ConsoleApp
 {
@@ -46,7 +49,15 @@ namespace ConsoleApp
             Console.WriteLine($"Your smtp setting is: {smtpConfig.Server}, {smtpConfig.User}, {smtpConfig.Port}");
 
             // run app
+            Console.WriteLine("Please change settings!");
+            Console.ReadLine();
             await serviceProvider.GetService<App>().Run();
+
+            Console.WriteLine("Please change settings 2!");
+            Console.ReadLine();
+            await serviceProvider.GetService<App>().Run();
+
+            Console.ReadLine();
         }
 
         private static void TestSendMail(SmtpConfig config)
@@ -91,7 +102,6 @@ namespace ConsoleApp
                 .Build();*/
             serviceCollection.Configure<SmtpConfig>(configuration.GetSection("Smtp"));
 
-
             serviceCollection.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
@@ -99,6 +109,12 @@ namespace ConsoleApp
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            //serviceCollection.AddSingleton<IDbConfig>(new DbConfig(() => configuration.GetConnectionString("DefaultConnection")));
+            //user scope 防止下一次配制变更程序未更新
+            serviceCollection.AddScoped<IDbConfig>((e) => new DbConfig(configuration.GetConnectionString("DefaultConnection")));
+
+            serviceCollection.AddTransient<IRaceDBSearch, RaceDBSearch>();
+            serviceCollection.AddTransient<IUserScoreDBSearch, UserScoreDBSearch>();
 
             // add services 
             serviceCollection.AddTransient<ITestService, TestService>();
