@@ -37,6 +37,8 @@ namespace NetCoreSample.Controllers
             _logger = logger;
         }
 
+
+
         [TempData]
         public string ErrorMessage { get; set; }
 

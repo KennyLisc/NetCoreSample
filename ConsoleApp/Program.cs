@@ -15,11 +15,14 @@ using ConsoleApp.Config;
 using FXTech.PDCA.Core.Interfaces.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.PlatformAbstractions;
 using NetCoreSample.Core.Core.Interface;
 using NetCoreSample.Core.Domain;
 using NetCoreSample.Core.Domain.User;
 using NetCoreSample.Data;
 using NetCoreSample.Data.Search;
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 namespace ConsoleApp
 {
@@ -78,10 +81,24 @@ namespace ConsoleApp
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
+            //Console.WriteLine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ConfigFiles", "nlog.config"));
+            //Console.WriteLine(Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "ConfigFiles", "nlog.config"));
             // add configured instance of logging
-            serviceCollection.AddSingleton(new LoggerFactory()
+            /*serviceCollection.AddSingleton(new LoggerFactory()
                 .AddConsole()
-                .AddDebug());
+                .AddDebug());*/
+
+            var logFortory = new LoggerFactory();
+
+            logFortory.ConfigureNLog(Path.Combine("ConfigFiles", "nlog.config"));
+
+            serviceCollection.AddSingleton(
+                logFortory
+                    .AddNLog()
+                    .AddConsole()
+                    .AddDebug()
+            );
+
             serviceCollection.AddLogging();
 
             // build configuration
@@ -153,3 +170,31 @@ namespace ConsoleApp
 
            Console.WriteLine($"Your smtp setting is: {smtpConfig.Server}, {smtpConfig.User}, {smtpConfig.Port}");
            */
+
+
+/*
+ <!-- 
+<targets>
+<!-- write logs to file  -->
+<target xsi:type="File" name="allfile" fileName="d:\nlog-all-${shortdate}.log"
+        layout="${longdate}|${event-properties:item=EventId.Id}|${uppercase:${level}}|${logger}|${message} ${exception}" />
+
+<!-- another file log, only own logs. Uses some ASP.NET core renderers -->
+<target xsi:type="File" name="ownFile-web" fileName="d:\nlog-own-${shortdate}.log"
+        layout="${longdate}|${event-properties:item=EventId.Id}|${uppercase:${level}}|${logger}|${message} ${exception}|url: ${aspnet-request-url}|action: ${aspnet-mvc-action}" />
+
+<!-- write to the void aka just remove -->
+<target xsi:type="Null" name="blackhole" />
+</targets>
+
+<!-- rules to map from logger name to target -->
+<rules>
+<!--All logs, including from Microsoft-->
+<logger name="*" minlevel="Trace" writeTo="allfile" />
+
+<!--Skip Microsoft logs and so log only own logs-->
+<logger name="Microsoft.*" minlevel="Trace" writeTo="blackhole" final="true" />
+<logger name="*" minlevel="Trace" writeTo="ownFile-web" />
+</rules>
+-->
+ */
