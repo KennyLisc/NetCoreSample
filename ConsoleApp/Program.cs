@@ -1,21 +1,13 @@
-﻿using ConsoleApp.Core;
+﻿using ConsoleApp.Config;
+using ConsoleApp.Core;
 using ConsoleApp.Services;
+using FXTech.PDCA.Core.Interfaces.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Reflection;
-using System.Threading.Tasks;
-using ConsoleApp.Config;
-using FXTech.PDCA.Core.Interfaces.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.PlatformAbstractions;
 using NetCoreSample.Core.Core.Interface;
 using NetCoreSample.Core.Domain;
 using NetCoreSample.Core.Domain.User;
@@ -23,6 +15,11 @@ using NetCoreSample.Data;
 using NetCoreSample.Data.Search;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using System;
+using System.IO;
+using System.Net;
+using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace ConsoleApp
 {
@@ -89,7 +86,7 @@ namespace ConsoleApp
                 .AddDebug());*/
 
             var logFortory = new LoggerFactory();
-
+            //https://github.com/NLog/NLog.Web/wiki/Getting-started-with-ASP.NET-Core-2
             logFortory.ConfigureNLog(Path.Combine("ConfigFiles", "nlog.config"));
 
             serviceCollection.AddSingleton(
