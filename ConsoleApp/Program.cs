@@ -49,7 +49,7 @@ namespace ConsoleApp
 
             var smtpConfig = serviceProvider.GetService<IOptions<SmtpConfig>>().Value;
             // TestSendMail(smtpConfig);
-            Console.WriteLine($"Your smtp setting is: {smtpConfig.Server}, {smtpConfig.User}, {smtpConfig.Port}");
+            // Console.WriteLine($"Your smtp setting is: {smtpConfig.Server}, {smtpConfig.User}, {smtpConfig.Port}");
 
             // run app
             Console.WriteLine("Please change settings!");
